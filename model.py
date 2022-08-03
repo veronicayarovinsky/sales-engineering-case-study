@@ -62,123 +62,185 @@ def main():
     PV_system_max = daily_kWh
     track_max_savings = 0
     results = []
-    stepsize1 = 200
+    #stepsize1 = 200
+    stepsize = 100
     PV_system_kW = 1
 
-    with open('results_step1.csv', 'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile)
+    ##################################
+    ### run model with 2 hr BESS duration
 
-        PV_system_kW = 1
+    bess_duration = 2       # hrs
+
+    # based on Megapack specs
+    if bess_duration == 2:
+        bess_power = 1257   # kW
+        bess_energy_max = 2514  # kWh
+    if bess_duration == 4:
+        bess_power = 739.5  # kW
+        bess_energy_max = 2958  # kWh
+    
+    with open('results.csv', 'w', newline='') as csvfile:
         while PV_system_kW < PV_system_max:
-            bat_system_max = PV_system_kW
             PV_scaling_factor = PV_system_kW/PV_SYSTEM_KW
-            bat_system_kWh = 1
             data = []
-            while bat_system_kWh < bat_system_max:
-                #print(PV_system_kW)
-                #print(bat_system_kWh)
-                total_net_savings = calc_netsavings(df, PV_scaling_factor, bat_system_kWh, LIFETIME)
-                data.append(total_net_savings)
+            total_net_savings = calc_netsavings(df, PV_scaling_factor, bess_energy_max, bess_power, bess_duration, LIFETIME)
+            data.append(total_net_savings)
 
-                if total_net_savings > track_max_savings:
-                    results = [total_net_savings, PV_system_kW, bat_system_kWh]
-                    track_max_savings = total_net_savings
-                
-                bat_system_kWh = bat_system_kWh + stepsize1
+            if total_net_savings > track_max_savings:
+                results = [total_net_savings, PV_system_kW]
+                track_max_savings = total_net_savings
 
-            csvwriter.writerow(data)
-            PV_system_kW = PV_system_kW + stepsize1
+            PV_system_kW = PV_system_kW + stepsize
+
 
     print(results)
 
-    PV_system_kW_min = results[1] - stepsize1
-    PV_system_kW_max = results[1] + stepsize1
+    ##################################
+    ### repeat with 4 hr BESS duration
 
-    bat_system_kWh_min = results[2] - stepsize1
-    bat_system_kWh_max = results[2] + stepsize1
+    bess_duration = 4       # hrs
 
-    if bat_system_kWh_min < 0: bat_system_kWh_min = 1
-    if bat_system_kWh_max < 0: bat_system_kWh_max = PV_system_kW_max
-
-    print(PV_system_kW_min)
-    print(PV_system_kW_max)
-    print(bat_system_kWh_min)
-    print(bat_system_kWh_max)
-
-    stepsize2 = 20
-
-    PV_system_kW = PV_system_kW_min
-
-    with open('results_step2.csv', 'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile)
-
-        while PV_system_kW < PV_system_kW_max:
-            bat_system_max = PV_system_kW
+    # based on Megapack specs
+    if bess_duration == 2:
+        bess_power = 1257   # kW
+        bess_energy_max = 2514  # kWh
+    if bess_duration == 4:
+        bess_power = 739.5  # kW
+        bess_energy_max = 2958  # kWh
+    
+    with open('results.csv', 'w', newline='') as csvfile:
+        while PV_system_kW < PV_system_max:
             PV_scaling_factor = PV_system_kW/PV_SYSTEM_KW
-            bat_system_kWh = bat_system_kWh_min
-
             data = []
-            while bat_system_kWh < bat_system_kWh_max:
-                #print(PV_system_kW)
-                #print(bat_system_kWh)
-                total_net_savings = calc_netsavings(df, PV_scaling_factor, bat_system_kWh, LIFETIME)
-                data.append(total_net_savings)
+            total_net_savings = calc_netsavings(df, PV_scaling_factor, bess_energy_max, bess_power, bess_duration, LIFETIME)
+            data.append(total_net_savings)
 
-                if total_net_savings > track_max_savings:
-                    results = [total_net_savings, PV_system_kW, bat_system_kWh]
-                    track_max_savings = total_net_savings
-                
-                bat_system_kWh = bat_system_kWh + stepsize2
+            if total_net_savings > track_max_savings:
+                results = [total_net_savings, PV_system_kW]
+                track_max_savings = total_net_savings
 
-            csvwriter.writerow(data)
-            PV_system_kW = PV_system_kW + stepsize2
+            PV_system_kW = PV_system_kW + stepsize
+
 
     print(results)
 
 
-    PV_system_kW_min = results[1] - stepsize2
-    PV_system_kW_max = results[1] + stepsize2
+    # with open('results_step1.csv', 'w', newline='') as csvfile:
+    #     csvwriter = csv.writer(csvfile)
 
-    bat_system_kWh_min = results[2] - stepsize2
-    bat_system_kWh_max = results[2] + stepsize2
+    #     PV_system_kW = 1
+    #     while PV_system_kW < PV_system_max:
+    #         bat_system_max = PV_system_kW
+    #         PV_scaling_factor = PV_system_kW/PV_SYSTEM_KW
+    #         bat_system_kWh = 1
+    #         data = []
+    #         while bat_system_kWh < bat_system_max:
+    #             #print(PV_system_kW)
+    #             #print(bat_system_kWh)
+    #             total_net_savings = calc_netsavings(df, PV_scaling_factor, bat_system_kWh, LIFETIME)
+    #             data.append(total_net_savings)
 
-    if bat_system_kWh_min < 0: bat_system_kWh_min = 1
-    if bat_system_kWh_max < 0: bat_system_kWh_max = PV_system_kW_max
-
-
-    print(PV_system_kW_min)
-    print(PV_system_kW_max)
-    print(bat_system_kWh_min)
-    print(bat_system_kWh_max)
-
-    stepsize3 = 1
-
-    PV_system_kW = PV_system_kW_min
-
-    with open('results_step3.csv', 'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        while PV_system_kW < PV_system_kW_max:
-            bat_system_max = PV_system_kW
-            PV_scaling_factor = PV_system_kW/PV_SYSTEM_KW
-            bat_system_kWh = bat_system_kWh_min
-
-            data = []
-            while bat_system_kWh < bat_system_kWh_max:
-                #print(PV_system_kW)
-                #print(bat_system_kWh)
-                total_net_savings = calc_netsavings(df, PV_scaling_factor, bat_system_kWh, LIFETIME)
-                data.append(total_net_savings)
-
-                if total_net_savings > track_max_savings:
-                    results = [total_net_savings, PV_system_kW, bat_system_kWh]
-                    track_max_savings = total_net_savings
+    #             if total_net_savings > track_max_savings:
+    #                 results = [total_net_savings, PV_system_kW, bat_system_kWh]
+    #                 track_max_savings = total_net_savings
                 
-                bat_system_kWh = bat_system_kWh + stepsize3
+    #             bat_system_kWh = bat_system_kWh + stepsize1
 
-            csvwriter.writerow(data)
-            PV_system_kW = PV_system_kW + stepsize3
+    #         csvwriter.writerow(data)
+    #         PV_system_kW = PV_system_kW + stepsize1
 
-    print(results)
+    # print(results)
+
+    # PV_system_kW_min = results[1] - stepsize1
+    # PV_system_kW_max = results[1] + stepsize1
+
+    # bat_system_kWh_min = results[2] - stepsize1
+    # bat_system_kWh_max = results[2] + stepsize1
+
+    # if bat_system_kWh_min < 0: bat_system_kWh_min = 1
+    # if bat_system_kWh_max < 0: bat_system_kWh_max = PV_system_kW_max
+
+    # print(PV_system_kW_min)
+    # print(PV_system_kW_max)
+    # print(bat_system_kWh_min)
+    # print(bat_system_kWh_max)
+
+    # stepsize2 = 20
+
+    # PV_system_kW = PV_system_kW_min
+
+    # with open('results_step2.csv', 'w', newline='') as csvfile:
+    #     csvwriter = csv.writer(csvfile)
+
+    #     while PV_system_kW < PV_system_kW_max:
+    #         bat_system_max = PV_system_kW
+    #         PV_scaling_factor = PV_system_kW/PV_SYSTEM_KW
+    #         bat_system_kWh = bat_system_kWh_min
+
+    #         data = []
+    #         while bat_system_kWh < bat_system_kWh_max:
+    #             #print(PV_system_kW)
+    #             #print(bat_system_kWh)
+    #             total_net_savings = calc_netsavings(df, PV_scaling_factor, bat_system_kWh, LIFETIME)
+    #             data.append(total_net_savings)
+
+    #             if total_net_savings > track_max_savings:
+    #                 results = [total_net_savings, PV_system_kW, bat_system_kWh]
+    #                 track_max_savings = total_net_savings
+                
+    #             bat_system_kWh = bat_system_kWh + stepsize2
+
+    #         csvwriter.writerow(data)
+    #         PV_system_kW = PV_system_kW + stepsize2
+
+    # print(results)
+
+
+    # PV_system_kW_min = results[1] - stepsize2
+    # PV_system_kW_max = results[1] + stepsize2
+
+    # bat_system_kWh_min = results[2] - stepsize2
+    # bat_system_kWh_max = results[2] + stepsize2
+
+    # if bat_system_kWh_min < 0: bat_system_kWh_min = 1
+    # if bat_system_kWh_max < 0: bat_system_kWh_max = PV_system_kW_max
+
+
+    # print(PV_system_kW_min)
+    # print(PV_system_kW_max)
+    # print(bat_system_kWh_min)
+    # print(bat_system_kWh_max)
+
+    # stepsize3 = 1
+
+    # PV_system_kW = PV_system_kW_min
+
+
+
+    # with open('results_step3.csv', 'w', newline='') as csvfile:
+    #     csvwriter = csv.writer(csvfile)
+    #     while PV_system_kW < PV_system_kW_max:
+    #         bat_system_max = PV_system_kW
+    #         PV_scaling_factor = PV_system_kW/PV_SYSTEM_KW
+    #         bat_system_kWh = bat_system_kWh_min
+
+    #         data = []
+    #         while bat_system_kWh < bat_system_kWh_max:
+    #             #print(PV_system_kW)
+    #             #print(bat_system_kWh)
+    #             total_net_savings = calc_netsavings(df, PV_scaling_factor, bat_system_kWh, bess_duration, LIFETIME)
+    #             data.append(total_net_savings)
+
+    #             if total_net_savings > track_max_savings:
+    #                 results = [total_net_savings, PV_system_kW, bat_system_kWh]
+    #                 track_max_savings = total_net_savings
+                
+    #             bat_system_kWh = bat_system_kWh + stepsize3
+
+    #         csvwriter.writerow(data)
+    #         PV_system_kW = PV_system_kW + stepsize3
+
+    # print(results)
 
 
     # RUNNING THE MODEL WITH THE OPTIMAL RESULTS HARDCODED
@@ -189,17 +251,13 @@ def main():
 
 
 
-def calc_netsavings(df, PV_scaling_factor, bat_system_kWh, totalyrs):
+def calc_netsavings(df, PV_scaling_factor, bess_energy_max, bess_power, bess_duration, totalyrs):
     #print('_'*40)
     
     # INITIALIZE TRACKERS
     PV_kWh = 0                  # keeps track of total kWh supplied by PV over time period in csv, used for calculating PV cost
     
-    total_addhrs_batstorage = 0 # keeps track of the additional hrs of battery (above baseline 2hrs), used for calculating battery cost
-    bat_stored_kWh = 0          # tracks kWh of charge remaining on battery
-    numhrs_bat_stored = 0       # number of hours that battery stores energy for (resets when battery is drained)
-    max_numhrs_bat = 0          # tracks max number of hours that battery stores energy for
-    bat_size_exceeded_ctr = 0   # counts number of times that PV supplies excess power that cannot be stored in battery due to battery size limitation
+    bess_kWh_stored = 0          # tracks kWh of charge remaining on battery
     
     num_gensets_used = 0        # keeps track of number of gensets needed at most
     curr_annualcost = 0         # used for calculating total diesel cost of current system (no PV)
@@ -226,52 +284,74 @@ def calc_netsavings(df, PV_scaling_factor, bat_system_kWh, totalyrs):
         # excess energy produced by PV
         if PV_production_kWh >= load_kWh:                                       
             excessload_kWh = PV_production_kWh - load_kWh
-            if bat_stored_kWh < bat_system_kWh:                                 # PV production + battery storage can't be greater than battery bank size -- note when this happens!!
-                bat_storage_remaining = bat_system_kWh
-                if bat_storage_remaining < excessload_kWh:
-                    bat_stored_kWh = bat_system_kWh
+            if bess_kWh_stored < bess_energy_max:                                 # PV production + battery storage can't be greater than battery bank size
+                if excessload_kWh <= bess_power:                                  # check that the energy added to the battery storage is less than the BESS power
+                    charge_kW = excessload_kWh
+                if excessload_kWh > bess_power:                                   # if the excess energy produced exceeds BESS power, the difference is lost
+                    charge_kW = bess_power
+                bess_storage_remaining = bess_energy_max - bess_kWh_stored
+                if bess_storage_remaining < charge_kW:
+                    bess_kWh_stored = bess_energy_max
                 else:
-                    bat_stored_kWh = bat_stored_kWh + excessload_kWh
-            else:
-                bat_size_exceeded_ctr = bat_size_exceeded_ctr + 1
-                #print('exceeded battery bank size') 
-            numhrs_bat_stored = numhrs_bat_stored + 1                           # counts current hour as an hour that needs to be stored
+                    bess_kWh_stored = bess_kWh_stored + charge_kW
 
 
         # energy produced by PV does not meet energy need --> batteries or gensets must be used
         if PV_production_kWh < load_kWh:                                        
-            remainingload_kWh = load_kWh - PV_production_kWh                    # deplete battery charge entirely, then use gensets --> minimizes cost of additional hrs of battery storage
+            remainingload_kWh = load_kWh - PV_production_kWh                     # deplete battery charge entirely, then use gensets --> minimizes cost of additional hrs of battery storage
 
-            if remainingload_kWh <= (BAT_EFFICIENCY * bat_stored_kWh):          # all remaining load can be supplied with battery
-                bat_stored_kWh = (BAT_EFFICIENCY * bat_stored_kWh) - remainingload_kWh
-                if bat_stored_kWh > 0:                                          # if remaining load is exactly the same as energy battery contains, battery is depleted
-                    numhrs_bat_stored = numhrs_bat_stored + 1
+            # if remaining load can be supplied by battery only
+            if remainingload_kWh <= (BAT_EFFICIENCY * bess_kWh_stored):
+                # if remaining load <= bess power --> bess only
+                if remainingload_kWh <= bess_power:                                  # check that the kW discharged from battery to supply load will not exceed BESS power
+                    discharge_kW = remainingload_kWh
+                    bess_kWh_stored = (BAT_EFFICIENCY * bess_kWh_stored) - discharge_kW
 
-            if remainingload_kWh > (bat_stored_kWh * BAT_EFFICIENCY):           # battery insufficient, gensets needed
+                # if remaining load > bess power --> bess + gensets
+                elif remainingload_kWh > bess_power:                                          # the kW discharged from battery cannot exceed BESS power
+                    discharge_kW = bess_power                                               # only the amount of the BESS power can be discharged
+                    bess_kWh_stored = (BAT_EFFICIENCY * bess_kWh_stored) - discharge_kW     # update battery storage to reflect kW discharged
+                    
+                    # the remaining load must be supplied by gensets
+                    d_kWh_need = remainingload_kWh - discharge_kW                           # energy (kWh) that diesel must supply
+                    array = get_d_cost('standby', d_kWh_need, num_hrs)               # diesel cost for this timeframe
+                    d_cost = array[0]
+                    genset_annualcost = genset_annualcost + d_cost                   # add to total diesel cost
 
-                # part of the load is supplied by the battery (until the battery is drained)
-                remainingload_kWh = remainingload_kWh - (BAT_EFFICIENCY * bat_stored_kWh)
-                numhrs_bat_stored = 0                       # battery drained
+                    num_gensets = array[1]
+                    if num_gensets_used < num_gensets:
+                        num_gensets_used = num_gensets
 
-                # the rest of the load is supplied by gensets
-                d_kWh_need = remainingload_kWh                                  # energy (kWh) that diesel must supply
 
-                array = get_d_cost('standby', d_kWh_need, num_hrs)              # diesel cost for this timeframe
-                d_cost = array[0]
-                genset_annualcost = genset_annualcost + d_cost                  # add to total diesel cost
+            # if remaining load cannot be supplied by battery only
+            elif remainingload_kWh > (bess_kWh_stored * BAT_EFFICIENCY):               # battery insufficient, gensets needed
+                                
+                # if bess_kWh_stored < bess_power --> bess_kWh_stored supplies load, then gensets supply the rest
+                if bess_kWh_stored <= bess_power:                             # BESS storage remaining is the amount of kW supplying load
+                    
+                    d_kWh_need = remainingload_kWh - bess_kWh_stored          # energy (kWh) that diesel must supply
+                    array = get_d_cost('standby', d_kWh_need, num_hrs)               # diesel cost for this timeframe
+                    d_cost = array[0]
+                    genset_annualcost = genset_annualcost + d_cost                   # add to total diesel cost
 
-                num_gensets = array[1]
-                if num_gensets_used < num_gensets:
-                    num_gensets_used = num_gensets
+                    num_gensets = array[1]
+                    if num_gensets_used < num_gensets:
+                        num_gensets_used = num_gensets
 
-        # calculate hours of battery storage (above the 2 hrs provided by baseline battery system)
-        if numhrs_bat_stored > 2:
-            total_addhrs_batstorage = total_addhrs_batstorage + (numhrs_bat_stored - 2)
-            if numhrs_bat_stored > max_numhrs_bat:
-                max_numhrs_bat = numhrs_bat_stored
+                # if bess_kWh_stored > bess_power --> bess_power supplies load, then gensets supply the rest
+                elif bess_kWh_stored <= bess_power:                             # BESS power is the amount of kW supplying load
 
-    # print('max_numhrs_bat: ' + str(max_numhrs_bat))
-    # print('bat_size_exceeded_ctr: ' + str(bat_size_exceeded_ctr))
+                    bess_kWh_stored = (BAT_EFFICIENCY * bess_kWh_stored) - bess_power
+
+                    d_kWh_need = remainingload_kWh - bess_power                      # energy (kWh) that diesel must supply
+                    array = get_d_cost('standby', d_kWh_need, num_hrs)               # diesel cost for this timeframe
+                    d_cost = array[0]
+                    genset_annualcost = genset_annualcost + d_cost                   # add to total diesel cost
+
+                    num_gensets = array[1]
+                    if num_gensets_used < num_gensets:
+                        num_gensets_used = num_gensets
+
 
 
     # CALCULATE COSTS
@@ -284,7 +364,8 @@ def calc_netsavings(df, PV_scaling_factor, bat_system_kWh, totalyrs):
     # print('new annual diesel cost is ' + str(genset_annualcost))
 
     # fixed costs
-    bat_fixedcost = (KWH_2HR_BAT_COST * bat_system_kWh) + (BAT_ADDHR_COST * max_numhrs_bat * bat_system_kWh)    # once in lifetime
+    bat_fixedcost = (KWH_2HR_BAT_COST * bess_energy_max) + (BAT_ADDHR_COST * bess_duration * bess_energy_max)    # once in lifetime
+    # bat_fixedcost = (KWH_2HR_BAT_COST * bess_kWh_stored) + (BAT_ADDHR_COST * bess_duration * bess_kWh_stored)    # once in lifetime
     # print('fixed battery cost is ' + str(bat_fixedcost))
 
     genset_fixedcost = STANDBY_KW * GENSET_COST_PER_KW                                                  # every 5 years
