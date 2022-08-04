@@ -8,7 +8,6 @@ What is the most optimal solution for customer?
 
 ## Files:
 * `model.py` contains the model to solve the case study, with results saved to `results.csv`
-* `plotresults.py` graphs results from model.py
 
 * Data Provided by Case Study (in ProjectData directory):
     * load.csv
