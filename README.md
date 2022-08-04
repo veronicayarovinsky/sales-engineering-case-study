@@ -7,13 +7,18 @@ What is the most optimal solution for customer?
 
 
 ## Files:
-* Data Provided by Case Study:
+* `model.py` contains the model to solve the case study, with results saved to `results.csv`
+* `plotresults.py` graphs results from model.py
+
+* Data Provided by Case Study (in ProjectData directory):
     * load.csv
     * PV_data.csv
-* `avgPVhourly.py` averages the 5-min interval data from `PV_data.csv` by hour, saved to `PV_data_hourly.csv`
-* `avgPVdaily.py` averages the PV data from `PV_data.csv` for each day, saved to `PV_dailyavg.csv`
-* `avgloaddaily.py` averages the load data from `load.csv` for each day, saved to `load.csv`
-* `avgbyhour.py` averages data for each hour separately to create a daily profile for both PV and load data, saved to `PV_dailyprofile.csv` and `load_dailyprofile.csv`.
-* `combinedata.py` compiles hourly PV data and hourly load data into `hourlydata.csv` to be used by `model.py`
-* `model.py` contains the model to solve the case study, with results saved to `results.csv`
+
+* OrganizingData directory contains python files to sort and organize data. It contains the following files:
+    * `avgPVhourly.py` averages the 5-min interval data from `PV_data.csv` by hour, saved to `PV_data_hourly.csv`
+    * `avgPVdaily.py` averages the PV data from `PV_data.csv` for each day, saved to `PV_dailyavg.csv`
+    * `avgloaddaily.py` averages the load data from `load.csv` for each day, saved to `load.csv`
+    * `avgbyhour.py` averages data for each hour separately to create a daily profile for both PV and load data, saved to `PV_dailyprofile.csv` and `load_dailyprofile.csv`.
+    * `combinedata.py` compiles hourly PV data and hourly load data into `hourlydata.csv` to be used by `model.py`
+
 
